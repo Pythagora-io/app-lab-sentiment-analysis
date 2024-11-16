@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/_head.ejs') %>
+<body>
+  <%- include('partials/_header.ejs') %>
+  <div class="content-wrapper">
+    <div class="content">
+      <main class="container mt-4">
+        <h2>Submit New Feedback</h2>
+        <form action="/feedback/new" method="POST" enctype="multipart/form-data">
+          <div id="manualInputs">
+            <h3>Manual Input</h3>
+            <div class="mb-3">
+              <label for="date" class="form-label">Date</label>
+              <input type="date" class="form-control" id="date" name="date">
+            </div>
+            <div class="mb-3">
+              <label for="customerName" class="form-label">Customer Name</label>
+              <input type="text" class="form-control" id="customerName" name="customerName">
+            </div>
+            <div class="mb-3">
+              <label for="product" class="form-label">Product</label>
+              <input type="text" class="form-control" id="product" name="product">
+            </div>
+            <div class="mb-3">
+              <label for="feedbackText" class="form-label">Feedback</label>
+              <textarea class="form-control" id="feedbackText" name="feedbackText" rows="3"></textarea>
+            </div>
+          </div>
+
+          <div id="fileUpload">
+            <h3>OR</h3>
+            <div class="mb-3">
+              <label for="csvFile" class="form-label">Upload CSV file</label>
+              <input type="file" class="form-control" id="csvFile" name="csvFile" accept=".csv">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Submit Feedback</button>
+        </form>
+
+        <script>
+        const manualInputs = ['date', 'customerName', 'product', 'feedbackText'];
+        const csvFileInput = document.getElementById('csvFile');
+
+        function updateRequiredFields() {
+          const isFileSelected = csvFileInput.files.length > 0;
+          const isAnyManualInputFilled = manualInputs.some(id => document.getElementById(id).value.trim() !== '');
+
+          manualInputs.forEach(id => {
+            const input = document.getElementById(id);
+            input.required = !isFileSelected;
+          });
+
+          csvFileInput.required = !isAnyManualInputFilled;
+
+          document.getElementById('manualInputs').style.opacity = isFileSelected ? '0.5' : '1';
+          document.getElementById('fileUpload').style.opacity = isAnyManualInputFilled ? '0.5' : '1';
+        }
+
+        csvFileInput.addEventListener('change', updateRequiredFields);
+        manualInputs.forEach(id => {
+          document.getElementById(id).addEventListener('input', updateRequiredFields);
+        });
+
+        // Initial call to set the correct state on page load
+        updateRequiredFields();
+        </script>
+      </main>
+    </div>
+  </div>
+  <%- include('partials/_footer.ejs') %>
+</body>
+</html>

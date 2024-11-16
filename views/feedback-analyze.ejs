@@ -1,0 +1,161 @@
+<%- include('partials/_head') %>
+<% console.log('Rendering feedback-analyze.ejs'); %>
+<% console.log('predefinedAspects:', predefinedAspects); %>
+<% console.log('customAspects:', customAspects); %>
+<%- include('partials/_header') %>
+
+<main class="container-fluid mt-4">
+  <div id="loadingSpinner" class="spinner-overlay" style="display: none;">
+    <div class="spinner"></div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <div class="sticky-sidebar">
+        <h2>Feedback Analysis</h2>
+        <button id="analyzeBtn" class="btn btn-success mb-3" disabled>Analyze Selected Feedback</button>
+
+        <h3>Customization</h3>
+        <div class="mb-3">
+          <label for="emotionsSelect" class="form-label">Select Emotions:</label>
+          <select id="emotionsSelect" class="form-select" multiple>
+            <optgroup label="Predefined Emotions">
+              <% emotions.filter(e => !customEmotions.includes(e)).forEach(emotion => { %>
+                <option value="<%= emotion %>"><%= emotion %></option>
+              <% }); %>
+            </optgroup>
+            <optgroup label="Custom Emotions">
+              <% customEmotions.forEach(emotion => { %>
+                <option value="<%= emotion %>"><%= emotion %></option>
+              <% }); %>
+            </optgroup>
+          </select>
+          <!-- Add this new form for custom emotions -->
+          <div class="mt-2">
+            <input type="text" id="customEmotion" class="form-control" placeholder="Enter custom emotion">
+            <button id="addCustomEmotion" class="btn btn-primary btn-sm mt-1">Add Custom Emotion</button>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="customAspectSelect" class="form-label">Aspects:</label>
+          <select id="customAspectSelect" class="form-select" multiple>
+            <optgroup label="Predefined Aspects">
+              <% predefinedAspects.forEach(aspect => { %>
+                <option value="<%= aspect %>"><%= aspect %></option>
+              <% }); %>
+            </optgroup>
+            <optgroup label="Custom Aspects">
+              <% customAspects.forEach(aspect => { %>
+                <option value="<%= aspect %>"><%= aspect %></option>
+              <% }); %>
+            </optgroup>
+          </select>
+          <!-- Add this new form for custom aspects -->
+          <div class="mt-2">
+            <input type="text" id="customAspectInput" class="form-control" placeholder="Enter custom aspect">
+            <button id="addCustomAspectBtn" class="btn btn-primary btn-sm mt-1">Add Custom Aspect</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="feedbacks-tab" data-bs-toggle="tab" data-bs-target="#feedbacks" type="button" role="tab" aria-controls="feedbacks" aria-selected="true">Feedbacks</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="results-tab" data-bs-toggle="tab" data-bs-target="#results" type="button" role="tab" aria-controls="results" aria-selected="false">Analysis Results</button>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="feedbacks" role="tabpanel" aria-labelledby="feedbacks-tab">
+          <div id="selectors" class="sticky-top bg-light p-3 mb-3">
+            <h3>Selectors</h3>
+            <div class="row">
+              <div class="col-md-3">
+                <label for="startDate" class="form-label">Start Date:</label>
+                <input type="date" id="startDate" class="form-control">
+              </div>
+              <div class="col-md-3">
+                <label for="endDate" class="form-label">End Date:</label>
+                <input type="date" id="endDate" class="form-control">
+              </div>
+              <div class="col-md-3">
+                <label for="productFilter" class="form-label">Product:</label>
+                <input type="text" id="productFilter" class="form-control">
+              </div>
+              <div class="col-md-3">
+                <label for="sortOrder" class="form-label">Sort Order:</label>
+                <select id="sortOrder" class="form-select">
+                  <option value="dateDesc">Date (Newest First)</option>
+                  <option value="dateAsc">Date (Oldest First)</option>
+                  <option value="productAsc">Product (A-Z)</option>
+                  <option value="productDesc">Product (Z-A)</option>
+                </select>
+              </div>
+            </div>
+            <div class="mt-2">
+              <button id="selectAllBtn" class="btn btn-primary btn-sm me-2">Select All</button>
+              <button id="deselectAllBtn" class="btn btn-secondary btn-sm">Deselect All</button>
+            </div>
+            <div id="appliedFilters" class="mt-2"></div>
+          </div>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>Date</th>
+                <th>Customer Name</th>
+                <th>Product</th>
+                <th>Feedback</th>
+              </tr>
+            </thead>
+            <tbody id="feedbackTableBody">
+              <% feedbacks.forEach(feedback => { %>
+                <tr>
+                  <td>
+                    <input type="checkbox" name="selectedFeedback" value="<%= feedback._id %>" data-date="<%= feedback.date %>">
+                  </td>
+                  <td><%= new Date(feedback.date).toLocaleDateString() %></td>
+                  <td><%= feedback.customerName %></td>
+                  <td><%= feedback.product %></td>
+                  <td><%= feedback.feedbackText %></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-pane fade" id="results" role="tabpanel" aria-labelledby="results-tab">
+          <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+          <div id="noResultsMessage" style="display: none;">
+            <p>No analysis results available. Please select feedback and click "Analyze Selected Feedback" to generate results.</p>
+          </div>
+          <div id="analysisResults" style="display: none;">
+            <div id="resultsSummary"></div>
+            <div id="detailedResults"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  window.predefinedEmotions = <%- JSON.stringify(emotions) %>;
+  window.customEmotions = <%- JSON.stringify(customEmotions) %>;
+  window.predefinedAspects = <%- JSON.stringify(predefinedAspects) %>;
+  window.customAspects = <%- JSON.stringify(customAspects) %>;
+</script>
+<script src="/js/feedback-analyze.js"></script>
+<script src="/js/custom-emotions.js"></script>
+<script src="/js/custom-aspects.js"></script>
+<script>
+  console.log('Custom emotion form exists:', !!document.getElementById('customEmotion'));
+  console.log('Add custom emotion button exists:', !!document.getElementById('addCustomEmotion'));
+  console.log('Custom aspect form exists:', !!document.getElementById('customAspectInput'));
+  console.log('Add custom aspect button exists:', !!document.getElementById('addCustomAspectBtn'));
+</script>
+<%- include('partials/_footer') %>

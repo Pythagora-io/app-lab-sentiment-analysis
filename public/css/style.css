@@ -1,0 +1,148 @@
+/* Placeholder for custom styles */
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    flex: 1;
+}
+
+#leftPanel, .sticky-sidebar {
+    position: sticky;
+    top: 20px;
+    height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding-right: 15px;
+}
+
+#mainPanel {
+    height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.sticky-sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+}
+
+.sticky-sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sticky-sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.sticky-sidebar::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+.sticky-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.footer {
+    width: 100%;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    padding: 1rem 0;
+}
+
+.footer-fixed {
+    position: fixed;
+    bottom: 0;
+}
+
+.content-wrapper {
+    min-height: calc(100vh - 56px); /* Adjust 56px to match your header height */
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    flex: 1 0 auto;
+}
+
+.nav-tabs {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 1000;
+}
+
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.analysis-result {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.analysis-result h4 {
+    margin-bottom: 0.5rem;
+}
+
+.analysis-result ul {
+    padding-left: 1.5rem;
+}
+
+#resultsSummary, #detailedResults {
+    margin-top: 1rem;
+}
+
+#selectors {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+select[multiple] {
+  height: auto;
+  min-height: 200px;
+}
+
+select[multiple] optgroup {
+  font-weight: bold;
+  color: #495057;
+}
+
+select[multiple] option {
+  padding: 5px 10px;
+}
+
+select[multiple] option:hover {
+  background-color: #f8f9fa;
+}

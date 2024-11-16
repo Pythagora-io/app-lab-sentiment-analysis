@@ -1,0 +1,36 @@
+<%- include('partials/_head') %>
+<%- include('partials/_header') %>
+
+<div class="container mt-4">
+  <h1>Profile</h1>
+  <form id="profileForm">
+    <div class="mb-3">
+      <label for="openaiApiKey" class="form-label">OpenAI API Key</label>
+      <input type="text" class="form-control" id="openaiApiKey" name="openaiApiKey" value="<%= user.openaiApiKey || '' %>">
+    </div>
+    <button type="submit" class="btn btn-primary">Update Profile</button>
+  </form>
+  <div id="updateMessage" class="mt-3"></div>
+</div>
+
+<script>
+document.getElementById('profileForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const openaiApiKey = document.getElementById('openaiApiKey').value;
+  try {
+    const response = await fetch('/profile/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ openaiApiKey })
+    });
+    const data = await response.json();
+    const messageDiv = document.getElementById('updateMessage');
+    messageDiv.textContent = data.message;
+    messageDiv.className = data.success ? 'alert alert-success' : 'alert alert-danger';
+  } catch (error) {
+    console.error('Error updating profile:', error);
+  }
+});
+</script>
+
+<%- include('partials/_footer') %>
