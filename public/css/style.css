@@ -4,6 +4,20 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    padding-bottom: 60px;
+}
+
+footer {
+    height: 40px;
+}
+
+nav.navbar {
+    padding: 10px 20px;
+}
+
+.pythagora-logo {
+    height: 20px;
+    margin-left: 5px;
 }
 
 .container {
@@ -42,18 +56,6 @@ body {
 
 .sticky-sidebar::-webkit-scrollbar-thumb:hover {
     background: #555;
-}
-
-.footer {
-    width: 100%;
-    background-color: #f8f9fa;
-    border-top: 1px solid #e9ecef;
-    padding: 1rem 0;
-}
-
-.footer-fixed {
-    position: fixed;
-    bottom: 0;
 }
 
 .content-wrapper {

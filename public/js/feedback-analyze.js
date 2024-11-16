@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
       `<strong>Applied Selectors:</strong> ${selectors.join(', ')}` : '';
   }
 
-  function showError(message) {
+  function displayError(message) {
     errorMessage.textContent = message;
     errorMessage.style.display = 'block';
   }
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectedAspects = Array.from(document.getElementById('customAspectSelect').selectedOptions).map(option => option.value);
 
     if (selectedIds.length === 0) {
-      showError('Please select at least one feedback to analyze.');
+      displayError('Please select at least one feedback to analyze.');
       return;
     }
 
@@ -151,18 +151,19 @@ document.addEventListener('DOMContentLoaded', function() {
         body: JSON.stringify({ selectedFeedbackIds: selectedIds, selectedEmotions, selectedAspects }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Analysis request failed');
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Analysis request failed');
       }
 
-      const data = await response.json();
       displayAnalysisResults(data.results);
       analysisPerformed = true;
       switchToResultsTab();
     } catch (error) {
       console.error('Error during analysis:', error);
-      showError(`An error occurred during analysis: ${error.message}`);
+      displayError(error.message);
+      switchToResultsTab();
     } finally {
       hideLoading();
     }
@@ -193,7 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add emotion analysis to the summary
     if (results.summary.emotion_analysis) {
-      console.log('Emotion analysis:', JSON.stringify(results.summary.emotion_analysis, null, 2));
       const emotionList = document.createElement('ul');
       Object.entries(results.summary.emotion_analysis).forEach(([emotion, intensity]) => {
         const li = document.createElement('li');
@@ -208,13 +208,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add aspect-based sentiment analysis to the summary
     if (results.summary.aspect_sentiment_analysis) {
-      console.log('Aspect-based sentiment analysis:', JSON.stringify(results.summary.aspect_sentiment_analysis, null, 2));
       const aspectSentimentList = document.createElement('ul');
       results.summary.aspect_sentiment_analysis.forEach(aspect => {
-        console.log('Processing aspect:', JSON.stringify(aspect, null, 2));
         const li = document.createElement('li');
-        console.log('Aspect properties:', Object.keys(aspect));
-        console.log('Sentiment score:', aspect.sentiment_score);
         li.innerHTML = `<strong>${aspect.aspect}:</strong> Sentiment: ${aspect.sentiment_score.toFixed(2)}, ${aspect.explanation}`;
         aspectSentimentList.appendChild(li);
       });

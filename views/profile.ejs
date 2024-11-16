@@ -6,7 +6,7 @@
   <form id="profileForm">
     <div class="mb-3">
       <label for="openaiApiKey" class="form-label">OpenAI API Key</label>
-      <input type="text" class="form-control" id="openaiApiKey" name="openaiApiKey" value="<%= user.openaiApiKey || '' %>">
+      <input type="password" class="form-control" id="openaiApiKey" name="openaiApiKey" value="<%= user.openaiApiKey || '' %>">
     </div>
     <button type="submit" class="btn btn-primary">Update Profile</button>
   </form>

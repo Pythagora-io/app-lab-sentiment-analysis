@@ -179,20 +179,14 @@ router.post('/feedback/add-custom-aspect', isAuthenticated, async (req, res) => 
 });
 
 router.post('/feedback/analyze', isAuthenticated, async (req, res) => {
-  console.log('Received analyze request');
-  console.log('Request body:', req.body);
   try {
     const { selectedFeedbackIds, selectedEmotions, selectedAspects } = req.body;
-    console.log('Selected feedback IDs:', selectedFeedbackIds);
-    console.log('Selected emotions:', selectedEmotions);
-    console.log('Selected aspects:', selectedAspects);
 
     if (!selectedFeedbackIds || selectedFeedbackIds.length === 0) {
       return res.status(400).json({ error: 'No feedback selected for analysis' });
     }
 
     const feedbacks = await Feedback.find({ _id: { $in: selectedFeedbackIds } });
-    console.log('Retrieved feedbacks:', feedbacks.length);
 
     if (feedbacks.length === 0) {
       return res.status(404).json({ error: 'No matching feedback found' });
@@ -204,14 +198,11 @@ router.post('/feedback/analyze', isAuthenticated, async (req, res) => {
     }
 
     const analysisResults = await Promise.all(feedbacks.map(async (feedback) => {
-      console.log(`Processing feedback ID: ${feedback._id}`);
       if (!feedback.analysis) {
-        console.log('Analyzing feedback...');
         try {
           const analysis = await analyzeFeedback(feedback.feedbackText, req.session.userId, user.openaiApiKey);
           feedback.analysis = analysis;
           await feedback.save();
-          console.log('Analysis saved to feedback');
         } catch (error) {
           console.error(`Error analyzing feedback ${feedback._id}:`, error);
           return {
@@ -222,8 +213,6 @@ router.post('/feedback/analyze', isAuthenticated, async (req, res) => {
             analysis: { error: 'Analysis failed' }
           };
         }
-      } else {
-        console.log('Using existing analysis');
       }
       return {
         customerName: feedback.customerName,
@@ -234,12 +223,10 @@ router.post('/feedback/analyze', isAuthenticated, async (req, res) => {
       };
     }));
 
-    console.log('All feedbacks processed');
-
     const summary = await generateSummary(analysisResults.map(result => result.analysis), user.openaiApiKey, selectedEmotions, selectedAspects);
-    console.log('Summary generated');
 
     res.json({
+      success: true,
       results: {
         summary,
         detailedAnalysis: analysisResults
@@ -248,7 +235,16 @@ router.post('/feedback/analyze', isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error('Error during analysis:', error);
     console.error('Error stack:', error.stack);
-    res.status(500).json({ error: 'An error occurred during analysis' });
+
+    let errorMessage = 'An error occurred during analysis';
+    if (error.message.includes('Incorrect API key provided')) {
+      errorMessage = 'Invalid OpenAI API key. Please update your API key in your profile.';
+    }
+
+    res.status(500).json({
+      success: false,
+      error: errorMessage
+    });
   }
 });
 
