@@ -182,9 +182,10 @@ router.post('/feedback/analyze', isAuthenticated, async (req, res) => {
   console.log('Received analyze request');
   console.log('Request body:', req.body);
   try {
-    const { selectedFeedbackIds, selectedEmotions } = req.body;
+    const { selectedFeedbackIds, selectedEmotions, selectedAspects } = req.body;
     console.log('Selected feedback IDs:', selectedFeedbackIds);
     console.log('Selected emotions:', selectedEmotions);
+    console.log('Selected aspects:', selectedAspects);
 
     if (!selectedFeedbackIds || selectedFeedbackIds.length === 0) {
       return res.status(400).json({ error: 'No feedback selected for analysis' });
@@ -235,7 +236,7 @@ router.post('/feedback/analyze', isAuthenticated, async (req, res) => {
 
     console.log('All feedbacks processed');
 
-    const summary = await generateSummary(analysisResults.map(result => result.analysis), user.openaiApiKey, selectedEmotions);
+    const summary = await generateSummary(analysisResults.map(result => result.analysis), user.openaiApiKey, selectedEmotions, selectedAspects);
     console.log('Summary generated');
 
     res.json({

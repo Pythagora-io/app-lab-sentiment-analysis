@@ -37,7 +37,7 @@
         </div>
 
         <div class="mb-3">
-          <label for="customAspectSelect" class="form-label">Aspects:</label>
+          <label for="customAspectSelect" class="form-label">Select Aspects for Analysis:</label>
           <select id="customAspectSelect" class="form-select" multiple>
             <optgroup label="Predefined Aspects">
               <% predefinedAspects.forEach(aspect => { %>
@@ -50,7 +50,7 @@
               <% }); %>
             </optgroup>
           </select>
-          <!-- Add this new form for custom aspects -->
+          <!-- Retain this form for custom aspects -->
           <div class="mt-2">
             <input type="text" id="customAspectInput" class="form-control" placeholder="Enter custom aspect">
             <button id="addCustomAspectBtn" class="btn btn-primary btn-sm mt-1">Add Custom Aspect</button>

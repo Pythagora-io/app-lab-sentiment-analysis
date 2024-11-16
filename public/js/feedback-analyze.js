@@ -132,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectedIds = Array.from(document.querySelectorAll('input[name="selectedFeedback"]:checked'))
       .map(checkbox => checkbox.value);
     const selectedEmotions = Array.from(emotionsSelect.selectedOptions).map(option => option.value);
+    const selectedAspects = Array.from(document.getElementById('customAspectSelect').selectedOptions).map(option => option.value);
 
     if (selectedIds.length === 0) {
       showError('Please select at least one feedback to analyze.');
@@ -147,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ selectedFeedbackIds: selectedIds, selectedEmotions }),
+        body: JSON.stringify({ selectedFeedbackIds: selectedIds, selectedEmotions, selectedAspects }),
       });
 
       if (!response.ok) {
@@ -168,22 +169,60 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   function displayAnalysisResults(results) {
+    console.log('Entering displayAnalysisResults with:', JSON.stringify(results, null, 2));
     noResultsMessage.style.display = 'none';
     analysisResults.style.display = 'block';
     const resultsSummary = document.getElementById('resultsSummary');
     const detailedResults = document.getElementById('detailedResults');
-    resultsSummary.innerHTML = '<h3>Summary</h3>';
-    detailedResults.innerHTML = '<h3>Detailed Analysis</h3>';
+    resultsSummary.innerHTML = '';
+    detailedResults.innerHTML = '';
 
     // Display summary
-    const summaryList = document.createElement('ul');
-    Object.entries(results.summary).forEach(([category, content]) => {
-      const li = document.createElement('li');
-      const formattedContent = Array.isArray(content) ? content.join(', ') : content;
-      li.innerHTML = `<strong>${category.charAt(0).toUpperCase() + category.slice(1)}:</strong> ${formattedContent}`;
-      summaryList.appendChild(li);
-    });
-    resultsSummary.appendChild(summaryList);
+    if (results.summary) {
+      const summaryList = document.createElement('ul');
+      Object.entries(results.summary).forEach(([category, content]) => {
+        if (category !== 'emotion_analysis' && category !== 'aspect_sentiment_analysis') {
+          const li = document.createElement('li');
+          const formattedContent = Array.isArray(content) ? content.join(', ') : content;
+          li.innerHTML = `<strong>${category.charAt(0).toUpperCase() + category.slice(1)}:</strong> ${formattedContent}`;
+          summaryList.appendChild(li);
+        }
+      });
+      resultsSummary.appendChild(summaryList);
+    }
+
+    // Add emotion analysis to the summary
+    if (results.summary.emotion_analysis) {
+      console.log('Emotion analysis:', JSON.stringify(results.summary.emotion_analysis, null, 2));
+      const emotionList = document.createElement('ul');
+      Object.entries(results.summary.emotion_analysis).forEach(([emotion, intensity]) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${emotion}:</strong> ${intensity}`;
+        emotionList.appendChild(li);
+      });
+      const emotionHeader = document.createElement('h4');
+      emotionHeader.textContent = 'Emotion Analysis';
+      resultsSummary.appendChild(emotionHeader);
+      resultsSummary.appendChild(emotionList);
+    }
+
+    // Add aspect-based sentiment analysis to the summary
+    if (results.summary.aspect_sentiment_analysis) {
+      console.log('Aspect-based sentiment analysis:', JSON.stringify(results.summary.aspect_sentiment_analysis, null, 2));
+      const aspectSentimentList = document.createElement('ul');
+      results.summary.aspect_sentiment_analysis.forEach(aspect => {
+        console.log('Processing aspect:', JSON.stringify(aspect, null, 2));
+        const li = document.createElement('li');
+        console.log('Aspect properties:', Object.keys(aspect));
+        console.log('Sentiment score:', aspect.sentiment_score);
+        li.innerHTML = `<strong>${aspect.aspect}:</strong> Sentiment: ${aspect.sentiment_score.toFixed(2)}, ${aspect.explanation}`;
+        aspectSentimentList.appendChild(li);
+      });
+      const aspectHeader = document.createElement('h4');
+      aspectHeader.textContent = 'Aspect-based Sentiment Analysis';
+      resultsSummary.appendChild(aspectHeader);
+      resultsSummary.appendChild(aspectSentimentList);
+    }
 
     // Display detailed results
     results.detailedAnalysis.forEach(result => {

@@ -49,9 +49,10 @@ Include sections for:
   }
 }
 
-async function generateSummary(analysisArray, userApiKey, selectedEmotions) {
+async function generateSummary(analysisArray, userApiKey, selectedEmotions, selectedAspects) {
   console.log('Generating summary');
   console.log('Selected emotions:', selectedEmotions);
+  console.log('Selected aspects:', selectedAspects);
   try {
     const openai = new OpenAI({ apiKey: userApiKey });
 
@@ -60,16 +61,21 @@ async function generateSummary(analysisArray, userApiKey, selectedEmotions) {
       emotionPrompt = `Additionally, perform an emotion analysis for the following emotions: ${selectedEmotions.join(', ')}. Rate the intensity of each emotion on a scale of 0-10 for the overall feedback.`;
     }
 
+    let aspectPrompt = '';
+    if (selectedAspects && selectedAspects.length > 0) {
+      aspectPrompt = `Also, provide an aspect-based sentiment analysis for the following aspects: ${selectedAspects.join(', ')}. For each aspect, provide an overall sentiment score (-1 to 1) and a brief explanation.`;
+    }
+
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
-          content: `You are a helpful assistant that summarizes multiple feedback analyses. Respond with a JSON object containing the following top-level keys: key trends, pain points, experiences, behaviors, objections, desires, interests, frequent questions, product clarity, psychographics, potential room for improvement${selectedEmotions.length > 0 ? ', emotion_analysis' : ''}. Each key should have an array value. If there's not enough information for a category, provide an empty array. Do not nest categories within other categories. Do not include any Markdown formatting in your response.`
+          content: `You are a helpful assistant that summarizes multiple feedback analyses. Respond with a JSON object containing the following top-level keys: key trends, pain points, experiences, behaviors, objections, desires, interests, frequent questions, product clarity, psychographics, potential room for improvement${selectedEmotions.length > 0 ? ', emotion_analysis' : ''}${selectedAspects.length > 0 ? ', aspect_sentiment_analysis' : ''}. Each key should have an array value${selectedAspects.length > 0 || selectedEmotions.length > 0 ? ', except for ' : '' }${selectedAspects.length > 0 ? 'emotion_analysis' : '' }${selectedEmotions.length > 0 && selectedAspects.length > 0 ? ' and ' : '' }${selectedAspects.length > 0 ? 'aspect_sentiment_analysis' : '' }. ${selectedEmotions.length > 0 ? 'The emotion_analysis should be an object with emotion names as keys and intensity values (0-10) as values. ' : '' }${selectedAspects.length > 0 ? 'The aspect_sentiment_analysis should be an array of objects, each with the following structure: { "aspect": string, "sentiment_score": number, "explanation": string }.' : '' } If there's not enough information for a category, provide an empty array. Do not nest categories within other categories. Do not include any Markdown formatting in your response.`
         },
         {
           role: "user",
-          content: `Summarize the following feedback analyses: ${JSON.stringify(analysisArray)} ${emotionPrompt}`
+          content: `Summarize the following feedback analyses: ${JSON.stringify(analysisArray)} ${emotionPrompt} ${aspectPrompt}`
         }
       ],
       max_tokens: 1000
