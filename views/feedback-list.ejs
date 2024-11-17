@@ -1,6 +1,7 @@
 <%- include('partials/_head') %>
 <%- include('partials/_header') %>
 
+<div class="animate__animated animate__fadeIn">
 <main class="container mt-4">
   <h1>Feedback List</h1>
   <a href="/feedback/analyze" class="btn btn-primary mb-3">Analyze Feedback</a>
@@ -25,8 +26,8 @@
           </tr>
         </thead>
         <tbody>
-          <% feedbacks.forEach(feedback => { %>
-            <tr>
+          <% feedbacks.forEach((feedback, index) => { %>
+            <tr class="animate__animated animate__fadeInUp" style="animation-delay: <%= index * 0.1 %>s;">
               <td><%= feedback.date.toLocaleDateString() %></td>
               <td><%= feedback.customerName %></td>
               <td><%= feedback.product %></td>
@@ -38,5 +39,6 @@
     </div>
   <% } %>
 </main>
+</div>
 
 <%- include('partials/_footer') %>

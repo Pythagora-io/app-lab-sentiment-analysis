@@ -1,14 +1,16 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
+  email: { type: String, unique: true, required: true },
   username: { type: String, unique: true, required: true },
   password: { type: String, required: true },
-  openaiApiKey: { type: String, required: true },
+  openaiApiKey: { type: String },
   customEmotions: {
     type: [String],
     validate: [arrayLimit, '{PATH} exceeds the limit of 5']
   },
-  predefinedAspects: [String], // Added line for predefined aspects
+  predefinedAspects: [String],
   customAspects: {
     type: [String],
     validate: [arrayLimit, '{PATH} exceeds the limit of 5']

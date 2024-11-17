@@ -11,9 +11,8 @@ router.get('/auth/register', (req, res) => {
 
 router.post('/auth/register', async (req, res) => {
   try {
-    const { username, password, openaiApiKey } = req.body; // Add openaiApiKey
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, password: hashedPassword, openaiApiKey }); // Include openaiApiKey
+    const { email, username, password } = req.body;
+    const user = new User({ email, username, password });
     await user.save();
     req.session.userId = user._id;
     res.redirect('/');
@@ -29,18 +28,13 @@ router.get('/auth/login', (req, res) => {
 
 router.post('/auth/login', async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(400).send('User not found');
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user || !await bcrypt.compare(password, user.password)) {
+      return res.status(400).send('Invalid email or password');
     }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (isMatch) {
-      req.session.userId = user._id;
-      return res.redirect('/');
-    } else {
-      return res.status(400).send('Password is incorrect');
-    }
+    req.session.userId = user._id;
+    return res.redirect('/');
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).send(error.message);

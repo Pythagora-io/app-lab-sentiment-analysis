@@ -3,14 +3,15 @@
 <%- include('partials/_head.ejs') %>
   <body>
 <%- include('partials/_header.ejs') %>
-    <main class="container mt-4">
+    <main class="container mt-4 animate__animated animate__fadeIn">
       <div class="text-center">
-        <h1>Pythagora Sentiment Analysis</h1>
+        <h1>Welcome to Pythagora Sentiment Analysis</h1>
         <% if (typeof user !== 'undefined' && user && !user.openaiApiKey) { %>
-          <div class="alert alert-warning" role="alert">
-            Your OpenAI API key is not set. Please visit your <a href="/profile" class="alert-link">Profile page</a> to set it up.
+          <div class="alert alert-info animate__animated animate__pulse">
+            Please set your OpenAI API key in your <a href="/profile">profile page</a> to start using the app.
           </div>
         <% } %>
+        <a href="/feedback/new" class="btn btn-primary animate__animated animate__bounceIn">Get Started</a>
       </div>
     </main>
 <%- include('partials/_footer.ejs') %>

@@ -94,11 +94,19 @@ app.use(feedbackRoutes); // Implementing feedback routes
 app.use('/aspects', aspectRoutes);
 
 // Root path response
-app.get("/", (req, res) => {
-  if (!req.session.userId) {
+app.get("/", async (req, res) => {
+  let user = null;
+  if (req.session.userId) {
+    try {
+      user = await User.findById(req.session.userId);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  }
+  else {
     return res.redirect('/auth/login');
   }
-  res.render("index", { user: req.user });
+  res.render('index', { user });
 });
 
 // If no routes handled the request, it's a 404

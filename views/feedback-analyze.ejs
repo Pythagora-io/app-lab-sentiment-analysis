@@ -4,7 +4,7 @@
 <% console.log('customAspects:', customAspects); %>
 <%- include('partials/_header') %>
 
-<main class="container-fluid mt-4">
+<main class="container-fluid mt-4 animate__animated animate__fadeIn">
   <div id="loadingSpinner" class="spinner-overlay" style="display: none;">
     <div class="spinner"></div>
   </div>
@@ -12,7 +12,7 @@
     <div class="col-md-3">
       <div class="sticky-sidebar">
         <h2>Feedback Analysis</h2>
-        <button id="analyzeBtn" class="btn btn-success mb-3" disabled>Analyze Selected Feedback</button>
+        <button id="analyzeBtn" class="btn btn-success mb-3 animate__animated animate__pulse animate__infinite" disabled>Analyze Selected Feedback</button>
 
         <h3>Customization</h3>
         <div class="mb-3">
@@ -114,8 +114,8 @@
               </tr>
             </thead>
             <tbody id="feedbackTableBody">
-              <% feedbacks.forEach(feedback => { %>
-                <tr>
+              <% feedbacks.forEach((feedback, index) => { %>
+                <tr class="animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
                   <td>
                     <input type="checkbox" name="selectedFeedback" value="<%= feedback._id %>" data-date="<%= feedback.date %>">
                   </td>
@@ -133,7 +133,7 @@
           <div id="noResultsMessage" style="display: none;">
             <p>No analysis results available. Please select feedback and click "Analyze Selected Feedback" to generate results.</p>
           </div>
-          <div id="analysisResults" style="display: none;">
+          <div id="analysisResults" class="animate__animated animate__fadeIn" style="display: none;">
             <div id="resultsSummary"></div>
             <div id="detailedResults"></div>
           </div>
